@@ -12,10 +12,13 @@ const BlogCard = ({ post, index }: { post: Post; index: number }) => {
     >
       <Link to={`/post/${post.slug}`} className="block group">
         <div className="bg-card rounded-xl border border-border overflow-hidden card-hover h-full">
-          <div className="aspect-video bg-secondary flex items-center justify-center">
-            <div className="text-4xl font-bold text-primary/15 group-hover:text-primary/25 transition-colors">
-              FB
-            </div>
+          <div className="aspect-video bg-secondary overflow-hidden">
+            <img
+              src={post.image}
+              alt={post.title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              loading="lazy"
+            />
           </div>
           <div className="p-5">
             <span className="inline-flex px-2.5 py-0.5 text-xs font-medium bg-primary/10 text-primary rounded-full">

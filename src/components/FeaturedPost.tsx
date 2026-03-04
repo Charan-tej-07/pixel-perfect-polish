@@ -7,8 +7,13 @@ const FeaturedPost = ({ post }: { post: Post }) => {
     <Link to={`/post/${post.slug}`} className="block">
       <div className="bg-card rounded-xl border border-border overflow-hidden card-hover">
         <div className="grid md:grid-cols-2 gap-0">
-          <div className="aspect-video md:aspect-auto bg-secondary flex items-center justify-center">
-            <div className="text-6xl font-bold text-primary/20">FB</div>
+          <div className="aspect-video md:aspect-auto md:min-h-[300px] bg-secondary overflow-hidden">
+            <img
+              src={post.image}
+              alt={post.title}
+              className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+              loading="lazy"
+            />
           </div>
           <div className="p-6 md:p-8 flex flex-col justify-center">
             <span className="inline-flex w-fit px-3 py-1 text-xs font-medium bg-primary/10 text-primary rounded-full">

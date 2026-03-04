@@ -9,6 +9,7 @@ export interface Post {
   date: string;
   readTime: string;
   tags: string[];
+  image: string;
   featured?: boolean;
 }
 
