@@ -1,0 +1,189 @@
+import { useState, useCallback } from "react";
+import { getDailyProblem, CodingProblem } from "@/data/problems";
+import { motion, AnimatePresence } from "framer-motion";
+import { CheckCircle2, XCircle, Code2, ChevronDown } from "lucide-react";
+
+const languages = ["JavaScript", "Python", "Java", "C++", "TypeScript", "Go"];
+const problemCategories = ["Web Development", "DSA", "Basic Coding"] as const;
+
+const CodingChallenges = () => {
+  const [selectedCategory, setSelectedCategory] = useState<string>("Basic Coding");
+  const [selectedLanguage, setSelectedLanguage] = useState("JavaScript");
+  const [code, setCode] = useState("");
+  const [result, setResult] = useState<"correct" | "wrong" | null>(null);
+  const [showHint, setShowHint] = useState(false);
+
+  const problem: CodingProblem = getDailyProblem(selectedCategory);
+
+  const handleRun = useCallback(() => {
+    if (!code.trim()) return;
+
+    if (selectedLanguage === "JavaScript" || selectedLanguage === "TypeScript") {
+      try {
+        const testCase = problem.testCases[0];
+        const fn = new Function("input", code);
+        const output = fn(JSON.parse(testCase.input));
+        const expected = JSON.parse(testCase.expected);
+
+        if (JSON.stringify(output) === JSON.stringify(expected)) {
+          setResult("correct");
+        } else {
+          setResult("wrong");
+        }
+      } catch {
+        setResult("wrong");
+      }
+    } else {
+      // For non-JS languages, check if expected output string appears in code
+      const expected = problem.testCases[0].expected;
+      if (code.toLowerCase().includes(expected.replace(/"/g, "").toLowerCase())) {
+        setResult("correct");
+      } else {
+        setResult("wrong");
+      }
+    }
+
+    setTimeout(() => setResult(null), 3000);
+  }, [code, selectedLanguage, problem]);
+
+  return (
+    <section className="mt-12">
+      <div className="flex items-center gap-2 mb-6">
+        <Code2 size={20} className="text-primary" />
+        <h2 className="text-xl font-bold text-foreground">Daily Coding Challenge</h2>
+      </div>
+
+      <div className="bg-card rounded-xl border border-border overflow-hidden">
+        {/* Category tabs */}
+        <div className="flex border-b border-border overflow-x-auto">
+          {problemCategories.map((cat) => (
+            <button
+              key={cat}
+              type="button"
+              onClick={() => {
+                setSelectedCategory(cat);
+                setCode("");
+                setResult(null);
+                setShowHint(false);
+              }}
+              className={`px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors ${
+                selectedCategory === cat
+                  ? "text-primary border-b-2 border-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
+        <div className="p-6">
+          {/* Language selector */}
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-xs text-muted-foreground">Language:</span>
+            <div className="relative">
+              <select
+                value={selectedLanguage}
+                onChange={(e) => setSelectedLanguage(e.target.value)}
+                className="appearance-none bg-secondary text-foreground text-xs px-3 py-1.5 pr-7 rounded-lg border border-border outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer"
+              >
+                {languages.map((lang) => (
+                  <option key={lang} value={lang}>
+                    {lang}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+            </div>
+          </div>
+
+          {/* Problem */}
+          <div className="mb-4">
+            <div className="flex items-center gap-2 mb-2">
+              <h3 className="text-base font-semibold text-foreground">{problem.title}</h3>
+              <span className={`text-xs px-2 py-0.5 rounded-full ${
+                problem.difficulty === "Easy"
+                  ? "bg-green-500/10 text-green-600"
+                  : problem.difficulty === "Medium"
+                  ? "bg-yellow-500/10 text-yellow-600"
+                  : "bg-red-500/10 text-red-600"
+              }`}>
+                {problem.difficulty}
+              </span>
+            </div>
+            <p className="text-sm text-muted-foreground">{problem.description}</p>
+            <p className="mt-2 text-xs text-muted-foreground font-mono bg-secondary px-3 py-2 rounded-lg">
+              {problem.example}
+            </p>
+          </div>
+
+          {/* Code editor */}
+          <textarea
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            placeholder={`// Write your ${selectedLanguage} solution here\n// Use 'input' variable for the input value\nreturn input;`}
+            className="w-full h-36 bg-foreground/5 text-foreground text-sm font-mono p-4 rounded-lg border border-border outline-none focus:ring-2 focus:ring-primary/20 resize-none"
+          />
+
+          {/* Actions */}
+          <div className="mt-4 flex items-center gap-3">
+            <button
+              type="button"
+              onClick={handleRun}
+              className="px-5 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
+            >
+              Run Code
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowHint(!showHint)}
+              className="px-4 py-2 border border-border text-foreground rounded-lg text-sm hover:bg-secondary transition-colors"
+            >
+              {showHint ? "Hide Hint" : "Show Hint"}
+            </button>
+          </div>
+
+          {showHint && (
+            <p className="mt-3 text-sm text-muted-foreground italic bg-secondary/50 px-4 py-2 rounded-lg">
+              💡 {problem.hint}
+            </p>
+          )}
+
+          {/* Result animations */}
+          <AnimatePresence>
+            {result === "correct" && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                className="mt-4 flex items-center gap-2 text-green-600"
+              >
+                <motion.div
+                  animate={{ scale: [1, 1.3, 1] }}
+                  transition={{ duration: 0.5, repeat: 2 }}
+                >
+                  <CheckCircle2 size={24} />
+                </motion.div>
+                <span className="text-sm font-medium">Correct! Great job! 🎉</span>
+              </motion.div>
+            )}
+            {result === "wrong" && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1, x: [0, -10, 10, -10, 10, 0] }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5 }}
+                className="mt-4 flex items-center gap-2 text-red-500"
+              >
+                <XCircle size={24} />
+                <span className="text-sm font-medium">Not quite right. Try again!</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default CodingChallenges;
