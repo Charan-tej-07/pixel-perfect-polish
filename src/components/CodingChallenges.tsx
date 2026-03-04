@@ -6,6 +6,27 @@ import { CheckCircle2, XCircle, Code2, ChevronDown } from "lucide-react";
 const languages = ["JavaScript", "Python", "Java", "C++", "TypeScript", "Go"];
 const problemCategories = ["Web Development", "DSA", "Basic Coding"] as const;
 
+/** Check if user code matches any acceptKeywords group */
+function validateCode(code: string, problem: CodingProblem): boolean {
+  const normalizedCode = code.toLowerCase().replace(/\s+/g, " ");
+
+  // Check each keyword group — if ALL keywords in any group are present, it's correct
+  for (const group of problem.acceptKeywords) {
+    const allPresent = group.every((keyword) =>
+      normalizedCode.includes(keyword.toLowerCase())
+    );
+    if (allPresent) return true;
+  }
+
+  // Also check if the expected output literally appears in the code
+  for (const tc of problem.testCases) {
+    const expected = tc.expected.replace(/"/g, "").toLowerCase();
+    if (expected.length > 1 && normalizedCode.includes(expected)) return true;
+  }
+
+  return false;
+}
+
 const CodingChallenges = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("Basic Coding");
   const [selectedLanguage, setSelectedLanguage] = useState("JavaScript");
@@ -18,33 +39,11 @@ const CodingChallenges = () => {
   const handleRun = useCallback(() => {
     if (!code.trim()) return;
 
-    if (selectedLanguage === "JavaScript" || selectedLanguage === "TypeScript") {
-      try {
-        const testCase = problem.testCases[0];
-        const fn = new Function("input", code);
-        const output = fn(JSON.parse(testCase.input));
-        const expected = JSON.parse(testCase.expected);
-
-        if (JSON.stringify(output) === JSON.stringify(expected)) {
-          setResult("correct");
-        } else {
-          setResult("wrong");
-        }
-      } catch {
-        setResult("wrong");
-      }
-    } else {
-      // For non-JS languages, check if expected output string appears in code
-      const expected = problem.testCases[0].expected;
-      if (code.toLowerCase().includes(expected.replace(/"/g, "").toLowerCase())) {
-        setResult("correct");
-      } else {
-        setResult("wrong");
-      }
-    }
+    const isCorrect = validateCode(code, problem);
+    setResult(isCorrect ? "correct" : "wrong");
 
     setTimeout(() => setResult(null), 3000);
-  }, [code, selectedLanguage, problem]);
+  }, [code, problem]);
 
   return (
     <section className="mt-12">
@@ -121,7 +120,7 @@ const CodingChallenges = () => {
           <textarea
             value={code}
             onChange={(e) => setCode(e.target.value)}
-            placeholder={`// Write your ${selectedLanguage} solution here\n// Use 'input' variable for the input value\nreturn input;`}
+            placeholder={`// Write your ${selectedLanguage} solution here...`}
             className="w-full h-36 bg-foreground/5 text-foreground text-sm font-mono p-4 rounded-lg border border-border outline-none focus:ring-2 focus:ring-primary/20 resize-none"
           />
 

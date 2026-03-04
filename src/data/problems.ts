@@ -7,6 +7,8 @@ export interface CodingProblem {
   example: string;
   hint: string;
   testCases: { input: string; expected: string }[];
+  /** Each inner array is a set of keywords that ALL must appear for a match. Any one group matching = correct. */
+  acceptKeywords: string[][];
 }
 
 const problems: CodingProblem[] = [
@@ -21,8 +23,8 @@ const problems: CodingProblem[] = [
     testCases: [
       { input: '"hello"', expected: '"olleh"' },
       { input: '"world"', expected: '"dlrow"' },
-      { input: '"a"', expected: '"a"' },
     ],
+    acceptKeywords: [["reverse"], ["split", "join"], ["for", "length"]],
   },
   {
     id: 2,
@@ -35,14 +37,13 @@ const problems: CodingProblem[] = [
     testCases: [
       { input: "15", expected: '"FizzBuzz"' },
       { input: "3", expected: '"Fizz"' },
-      { input: "5", expected: '"Buzz"' },
-      { input: "7", expected: '"7"' },
     ],
+    acceptKeywords: [["fizz", "buzz"], ["% 3", "% 5"], ["%3", "%5"]],
   },
   {
     id: 3,
     title: "Palindrome Check",
-    description: "Write a function that checks if a given string is a palindrome (reads the same forwards and backwards).",
+    description: "Write a function that checks if a given string is a palindrome.",
     category: "DSA",
     difficulty: "Easy",
     example: 'Input: "racecar" → Output: true',
@@ -50,8 +51,8 @@ const problems: CodingProblem[] = [
     testCases: [
       { input: '"racecar"', expected: "true" },
       { input: '"hello"', expected: "false" },
-      { input: '"madam"', expected: "true" },
     ],
+    acceptKeywords: [["reverse"], ["split", "reverse", "join"], ["for", "length"]],
   },
   {
     id: 4,
@@ -63,8 +64,8 @@ const problems: CodingProblem[] = [
     hint: "Use a hash map to store complements.",
     testCases: [
       { input: "[2,7,11,15], 9", expected: "[0,1]" },
-      { input: "[3,2,4], 6", expected: "[1,2]" },
     ],
+    acceptKeywords: [["map", "target"], ["hash"], ["for", "target"], ["complement"]],
   },
   {
     id: 5,
@@ -77,6 +78,7 @@ const problems: CodingProblem[] = [
     testCases: [
       { input: '"center"', expected: '"display: flex; justify-content: center; align-items: center;"' },
     ],
+    acceptKeywords: [["flex", "center"], ["display", "justify-content", "align-items"], ["grid", "place-items"]],
   },
   {
     id: 6,
@@ -88,9 +90,8 @@ const problems: CodingProblem[] = [
     hint: "Use Math.max with spread operator.",
     testCases: [
       { input: "[3,7,2,9,1]", expected: "9" },
-      { input: "[1]", expected: "1" },
-      { input: "[-5,-2,-8]", expected: "-2" },
     ],
+    acceptKeywords: [["math.max"], ["max"], ["sort"], ["reduce"], ["for", ">"]],
   },
   {
     id: 7,
@@ -102,9 +103,9 @@ const problems: CodingProblem[] = [
     hint: "Use iteration or memoization.",
     testCases: [
       { input: "6", expected: "8" },
-      { input: "0", expected: "0" },
       { input: "10", expected: "55" },
     ],
+    acceptKeywords: [["fib"], ["n-1", "n-2"], ["prev"], ["memo"], ["dp"], ["recursive"]],
   },
   {
     id: 8,
@@ -117,6 +118,7 @@ const problems: CodingProblem[] = [
     testCases: [
       { input: '"768"', expected: '"@media (max-width: 768px)"' },
     ],
+    acceptKeywords: [["@media", "max-width"], ["media", "768"]],
   },
   {
     id: 9,
@@ -128,9 +130,8 @@ const problems: CodingProblem[] = [
     hint: "Use a regex or loop through characters.",
     testCases: [
       { input: '"hello world"', expected: "3" },
-      { input: '"aeiou"', expected: "5" },
-      { input: '"xyz"', expected: "0" },
     ],
+    acceptKeywords: [["aeiou"], ["vowel"], ["match"], ["regex"]],
   },
   {
     id: 10,
@@ -142,8 +143,8 @@ const problems: CodingProblem[] = [
     hint: "Use two pointers: left and right.",
     testCases: [
       { input: "[1,3,5,7,9], 5", expected: "2" },
-      { input: "[1,3,5,7,9], 6", expected: "-1" },
     ],
+    acceptKeywords: [["mid"], ["left", "right"], ["binary"], ["low", "high"], ["while"]],
   },
   {
     id: 11,
@@ -156,6 +157,7 @@ const problems: CodingProblem[] = [
     testCases: [
       { input: '"myBtn"', expected: '"addEventListener"' },
     ],
+    acceptKeywords: [["addeventlistener", "click"], ["onclick"], ["getelementbyid", "click"]],
   },
   {
     id: 12,
@@ -167,14 +169,14 @@ const problems: CodingProblem[] = [
     hint: "Use recursion or Array.flat(Infinity).",
     testCases: [
       { input: "[[1,2],[3,[4,5]]]", expected: "[1,2,3,4,5]" },
-      { input: "[1,[2,[3]]]", expected: "[1,2,3]" },
     ],
+    acceptKeywords: [["flat"], ["concat", "recursive"], ["reduce", "concat"], ["isarray"]],
   },
 ];
 
 export function getDailyProblem(category?: string): CodingProblem {
-  const filtered = category 
-    ? problems.filter(p => p.category === category) 
+  const filtered = category
+    ? problems.filter(p => p.category === category)
     : problems;
   const dayOfYear = Math.floor(
     (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000
