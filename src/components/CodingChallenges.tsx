@@ -1,49 +1,81 @@
 import { useState, useCallback } from "react";
 import { getDailyProblem, CodingProblem } from "@/data/problems";
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle2, XCircle, Code2, ChevronDown } from "lucide-react";
+import { CheckCircle2, XCircle, AlertTriangle, Code2, ChevronDown } from "lucide-react";
 
 const languages = ["JavaScript", "Python", "Java", "C++", "TypeScript", "Go"];
 const problemCategories = ["Web Development", "DSA", "Basic Coding"] as const;
 
-/** Check if user code matches any acceptKeywords group */
-function validateCode(code: string, problem: CodingProblem): boolean {
-  const normalizedCode = code.toLowerCase().replace(/\s+/g, " ");
+interface ValidationResult {
+  isCorrect: boolean;
+  correctAnswer: string;
+}
+
+function validateCode(code: string, problem: CodingProblem): ValidationResult {
+  const trimmedCode = code.trim();
+  const normalizedCode = trimmedCode.toLowerCase().replace(/\s+/g, " ");
 
   // Check each keyword group — if ALL keywords in any group are present, it's correct
   for (const group of problem.acceptKeywords) {
     const allPresent = group.every((keyword) =>
       normalizedCode.includes(keyword.toLowerCase())
     );
-    if (allPresent) return true;
+    if (allPresent) {
+      return { isCorrect: true, correctAnswer: problem.sampleAnswer };
+    }
   }
 
   // Also check if the expected output literally appears in the code
   for (const tc of problem.testCases) {
     const expected = tc.expected.replace(/"/g, "").toLowerCase();
-    if (expected.length > 1 && normalizedCode.includes(expected)) return true;
+    if (expected.length > 1 && normalizedCode.includes(expected)) {
+      return { isCorrect: true, correctAnswer: problem.sampleAnswer };
+    }
   }
 
-  return false;
+  return { isCorrect: false, correctAnswer: problem.sampleAnswer };
 }
+
+type ResultState = 
+  | { type: "correct" }
+  | { type: "wrong"; correctAnswer: string }
+  | { type: "empty" }
+  | null;
 
 const CodingChallenges = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("Basic Coding");
   const [selectedLanguage, setSelectedLanguage] = useState("JavaScript");
   const [code, setCode] = useState("");
-  const [result, setResult] = useState<"correct" | "wrong" | null>(null);
+  const [result, setResult] = useState<ResultState>(null);
   const [showHint, setShowHint] = useState(false);
 
   const problem: CodingProblem = getDailyProblem(selectedCategory);
 
   const handleRun = useCallback(() => {
-    if (!code.trim()) return;
+    // Handle empty input
+    if (!code.trim()) {
+      setResult({ type: "empty" });
+      setTimeout(() => setResult(null), 3000);
+      return;
+    }
 
-    const isCorrect = validateCode(code, problem);
-    setResult(isCorrect ? "correct" : "wrong");
+    const validation = validateCode(code, problem);
 
-    setTimeout(() => setResult(null), 3000);
+    if (validation.isCorrect) {
+      setResult({ type: "correct" });
+      setTimeout(() => setResult(null), 4000);
+    } else {
+      setResult({ type: "wrong", correctAnswer: validation.correctAnswer });
+      // Keep wrong answer visible longer so user can read the correct answer
+      setTimeout(() => setResult(null), 8000);
+    }
   }, [code, problem]);
+
+  const resetState = () => {
+    setCode("");
+    setResult(null);
+    setShowHint(false);
+  };
 
   return (
     <section className="mt-12">
@@ -61,9 +93,7 @@ const CodingChallenges = () => {
               type="button"
               onClick={() => {
                 setSelectedCategory(cat);
-                setCode("");
-                setResult(null);
-                setShowHint(false);
+                resetState();
               }}
               className={`px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors ${
                 selectedCategory === cat
@@ -148,34 +178,59 @@ const CodingChallenges = () => {
             </p>
           )}
 
-          {/* Result animations */}
+          {/* Result feedback */}
           <AnimatePresence>
-            {result === "correct" && (
+            {result?.type === "empty" && (
               <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
+                key="empty"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="mt-4 flex items-center gap-2 text-yellow-600 bg-yellow-500/10 px-4 py-3 rounded-lg border border-yellow-500/20"
+              >
+                <AlertTriangle size={20} />
+                <span className="text-sm font-medium">⚠️ Please enter an answer before running.</span>
+              </motion.div>
+            )}
+
+            {result?.type === "correct" && (
+              <motion.div
+                key="correct"
+                initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                className="mt-4 flex items-center gap-2 text-green-600"
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="mt-4 flex items-center gap-2 text-green-600 bg-green-500/10 px-4 py-3 rounded-lg border border-green-500/20"
               >
                 <motion.div
                   animate={{ scale: [1, 1.3, 1] }}
                   transition={{ duration: 0.5, repeat: 2 }}
                 >
-                  <CheckCircle2 size={24} />
+                  <CheckCircle2 size={22} />
                 </motion.div>
-                <span className="text-sm font-medium">Correct! Great job! 🎉</span>
+                <span className="text-sm font-medium">✅ Correct Answer! Great job! 🎉</span>
               </motion.div>
             )}
-            {result === "wrong" && (
+
+            {result?.type === "wrong" && (
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1, x: [0, -10, 10, -10, 10, 0] }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.5 }}
-                className="mt-4 flex items-center gap-2 text-red-500"
+                key="wrong"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="mt-4 space-y-3"
               >
-                <XCircle size={24} />
-                <span className="text-sm font-medium">Not quite right. Try again!</span>
+                <div className="flex items-center gap-2 text-red-500 bg-red-500/10 px-4 py-3 rounded-lg border border-red-500/20">
+                  <XCircle size={22} />
+                  <span className="text-sm font-medium">❌ Wrong Answer. Try again!</span>
+                </div>
+                <div className="bg-secondary/70 rounded-lg border border-border p-4">
+                  <p className="text-xs font-semibold text-muted-foreground mb-2">
+                    The correct answer is:
+                  </p>
+                  <pre className="text-xs font-mono text-foreground whitespace-pre-wrap leading-relaxed">
+                    {result.correctAnswer}
+                  </pre>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
