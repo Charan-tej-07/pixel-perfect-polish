@@ -9,6 +9,7 @@ export interface Post {
   date: string;
   readTime: string;
   tags: string[];
+  image: string;
   featured?: boolean;
 }
 
@@ -61,6 +62,7 @@ The trajectory is clear: AI is becoming infrastructure, not just a feature. The 
     date: "Mar 3, 2026",
     readTime: "6 min read",
     tags: ["AI", "Generative AI", "Machine Learning", "Agents"],
+    image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80",
     featured: true,
   },
   {
@@ -111,6 +113,7 @@ The combination of memory safety, performance, and developer experience has made
     date: "Mar 2, 2026",
     readTime: "5 min read",
     tags: ["Rust", "Web Development", "Programming", "WebAssembly"],
+    image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80",
   },
   {
     id: 3,
@@ -139,6 +142,7 @@ IBM, Google, and several startups have achieved systems with over 1000 logical q
     date: "Mar 1, 2026",
     readTime: "4 min read",
     tags: ["Quantum Computing", "Emerging Tech", "Cryptography"],
+    image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800&q=80",
   },
   {
     id: 4,
@@ -180,6 +184,7 @@ Upgrading is straightforward for most projects. The TypeScript team has maintain
     date: "Feb 28, 2026",
     readTime: "5 min read",
     tags: ["TypeScript", "JavaScript", "Web Development"],
+    image: "https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=800&q=80",
   },
   {
     id: 5,
@@ -215,6 +220,7 @@ Studies show 30-50% productivity gains with well-integrated AI assistants. The k
     date: "Feb 27, 2026",
     readTime: "7 min read",
     tags: ["AI", "Developer Tools", "Productivity"],
+    image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&q=80",
   },
   {
     id: 6,
@@ -253,5 +259,6 @@ Not everything needs to be decentralized. The winning approach is hybrid archite
     date: "Feb 25, 2026",
     readTime: "5 min read",
     tags: ["Web3", "Decentralized", "Blockchain", "Identity"],
+    image: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&q=80",
   },
 ];
