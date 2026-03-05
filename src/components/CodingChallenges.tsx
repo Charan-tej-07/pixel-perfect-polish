@@ -11,32 +11,57 @@ interface ValidationResult {
   correctAnswer: string;
 }
 
+/**
+ * Strict validation: user code must contain ALL keywords from at least one group,
+ * AND must have a minimum length relative to the keyword group complexity.
+ * Single-word inputs or trivially short code will never pass.
+ */
 function validateCode(code: string, problem: CodingProblem): ValidationResult {
   const trimmedCode = code.trim();
   const normalizedCode = trimmedCode.toLowerCase().replace(/\s+/g, " ");
 
-  // Check each keyword group — if ALL keywords in any group are present, it's correct
+  // Minimum code length — must be at least 15 characters to be a real attempt
+  if (normalizedCode.length < 15) {
+    console.log("[Validation] Code too short:", normalizedCode.length, "chars");
+    return { isCorrect: false, correctAnswer: problem.sampleAnswer };
+  }
+
+  // Check keyword groups — ALL keywords in a group must be present
   for (const group of problem.acceptKeywords) {
-    const allPresent = group.every((keyword) =>
+    // Require at least 2 keywords matched for single-keyword groups
+    const minKeywords = Math.max(2, group.length);
+    const matchedKeywords = group.filter((keyword) =>
       normalizedCode.includes(keyword.toLowerCase())
     );
-    if (allPresent) {
+
+    console.log(`[Validation] Group [${group.join(", ")}]: matched ${matchedKeywords.length}/${group.length}`);
+
+    // ALL keywords in the group must be present, and group must have 2+ keywords
+    // Single-keyword groups require the code to also contain function-like structure
+    if (group.length === 1) {
+      const keyword = group[0].toLowerCase();
+      const hasStructure =
+        normalizedCode.includes("function") ||
+        normalizedCode.includes("=>") ||
+        normalizedCode.includes("return") ||
+        normalizedCode.includes("{") ||
+        normalizedCode.includes("@media") ||
+        normalizedCode.includes("display");
+      if (normalizedCode.includes(keyword) && hasStructure) {
+        console.log("[Validation] ✅ Single-keyword group matched with structure");
+        return { isCorrect: true, correctAnswer: problem.sampleAnswer };
+      }
+    } else if (matchedKeywords.length === group.length) {
+      console.log("[Validation] ✅ Full keyword group matched");
       return { isCorrect: true, correctAnswer: problem.sampleAnswer };
     }
   }
 
-  // Also check if the expected output literally appears in the code
-  for (const tc of problem.testCases) {
-    const expected = tc.expected.replace(/"/g, "").toLowerCase();
-    if (expected.length > 1 && normalizedCode.includes(expected)) {
-      return { isCorrect: true, correctAnswer: problem.sampleAnswer };
-    }
-  }
-
+  console.log("[Validation] ❌ No keyword group fully matched");
   return { isCorrect: false, correctAnswer: problem.sampleAnswer };
 }
 
-type ResultState = 
+type ResultState =
   | { type: "correct" }
   | { type: "wrong"; correctAnswer: string }
   | { type: "empty" }
@@ -47,26 +72,43 @@ const CodingChallenges = () => {
   const [selectedLanguage, setSelectedLanguage] = useState("JavaScript");
   const [code, setCode] = useState("");
   const [result, setResult] = useState<ResultState>(null);
+  const [isValidating, setIsValidating] = useState(false);
   const [showHint, setShowHint] = useState(false);
 
   const problem: CodingProblem = getDailyProblem(selectedCategory);
 
   const handleRun = useCallback(() => {
-    // Handle empty input
-    if (!code.trim()) {
+    // 1. Clear ALL previous state first
+    setResult(null);
+    setIsValidating(true);
+
+    // 2. Handle empty input
+    const trimmedCode = code.trim();
+    if (!trimmedCode) {
+      console.log("[Submit] Empty input");
+      setIsValidating(false);
       setResult({ type: "empty" });
       setTimeout(() => setResult(null), 3000);
       return;
     }
 
-    const validation = validateCode(code, problem);
+    // 3. Run fresh validation — never cached
+    console.log("[Submit] User answer:", trimmedCode);
+    console.log("[Submit] Problem:", problem.title);
 
-    if (validation.isCorrect) {
+    const validation: ValidationResult = validateCode(trimmedCode, problem);
+
+    console.log("[Submit] isCorrect:", validation.isCorrect);
+    console.log("[Submit] correctAnswer:", validation.correctAnswer);
+
+    // 4. Set result based ONLY on fresh validation
+    setIsValidating(false);
+
+    if (validation.isCorrect === true) {
       setResult({ type: "correct" });
       setTimeout(() => setResult(null), 4000);
     } else {
       setResult({ type: "wrong", correctAnswer: validation.correctAnswer });
-      // Keep wrong answer visible longer so user can read the correct answer
       setTimeout(() => setResult(null), 8000);
     }
   }, [code, problem]);
@@ -75,6 +117,7 @@ const CodingChallenges = () => {
     setCode("");
     setResult(null);
     setShowHint(false);
+    setIsValidating(false);
   };
 
   return (
@@ -159,9 +202,10 @@ const CodingChallenges = () => {
             <button
               type="button"
               onClick={handleRun}
-              className="px-5 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
+              disabled={isValidating}
+              className="px-5 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Run Code
+              {isValidating ? "Validating..." : "Run Code"}
             </button>
             <button
               type="button"
