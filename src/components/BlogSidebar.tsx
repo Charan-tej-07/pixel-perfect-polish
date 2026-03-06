@@ -1,8 +1,11 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { posts, categories } from "@/data/posts";
 import { TrendingUp } from "lucide-react";
+import NewsletterModal from "./NewsletterModal";
 
 const BlogSidebar = () => {
+  const [showNewsletter, setShowNewsletter] = useState(false);
   const trendingPosts = posts.slice(0, 4);
 
   return (
@@ -56,20 +59,16 @@ const BlogSidebar = () => {
         <p className="text-xs text-muted-foreground mb-4">
           Get the latest tech insights delivered to your inbox.
         </p>
-        <div className="space-y-2">
-          <input
-            type="email"
-            placeholder="your@email.com"
-            className="w-full px-3 py-2 text-sm bg-secondary border border-border rounded-lg text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/20"
-          />
-          <button
-            type="button"
-            className="w-full px-3 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
-          >
-            Subscribe
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => setShowNewsletter(true)}
+          className="w-full px-3 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
+        >
+          Subscribe
+        </button>
       </div>
+
+      <NewsletterModal isOpen={showNewsletter} onClose={() => setShowNewsletter(false)} />
 
       {/* Ad Placeholder */}
       <div className="bg-secondary/50 rounded-xl border border-border p-5 text-center">
