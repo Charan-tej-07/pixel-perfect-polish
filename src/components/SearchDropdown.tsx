@@ -20,8 +20,17 @@ const SearchDropdown = ({ onClose }: SearchDropdownProps) => {
   }, []);
 
   useEffect(() => {
-    onClose();
-  }, [location.pathname]);
+    const path = location.pathname;
+    return () => {};
+  }, []);
+
+  const pathnameRef = useRef(location.pathname);
+  useEffect(() => {
+    if (location.pathname !== pathnameRef.current) {
+      onClose();
+    }
+    pathnameRef.current = location.pathname;
+  }, [location.pathname, onClose]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
