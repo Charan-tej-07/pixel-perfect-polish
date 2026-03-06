@@ -1,6 +1,10 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
+import NewsletterModal from "./NewsletterModal";
 
 const HeroSection = () => {
+  const [showNewsletter, setShowNewsletter] = useState(false);
+
   const scrollToPosts = () => {
     document.getElementById("posts")?.scrollIntoView({ behavior: "smooth" });
   };
