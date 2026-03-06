@@ -8,7 +8,7 @@ interface NewsletterModalProps {
 }
 
 const MAILCHIMP_ACTION =
-  "https://example.us21.list-manage.com/subscribe/post?u=PLACEHOLDER&id=PLACEHOLDER";
+  "https://gmail.us22.list-manage.com/subscribe/post?u=43583aaad836e47b56f3935b8&id=66857e160a&f_id=009ec2e1f0";
 
 const NewsletterModal = ({ isOpen, onClose }: NewsletterModalProps) => {
   const [email, setEmail] = useState("");
