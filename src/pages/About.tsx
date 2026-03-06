@@ -6,18 +6,18 @@ import AnimatedSection from "@/components/AnimatedSection";
 import { Brain, Atom, Code2, Rocket, CheckCircle2 } from "lucide-react";
 
 const coverItems = [
-  { icon: Brain, title: "Artificial Intelligence", desc: "Deep dives into machine learning, LLMs, and AI-powered tools transforming industries." },
-  { icon: Atom, title: "Quantum Computing", desc: "Breaking down quantum advancements and their real-world applications." },
-  { icon: Code2, title: "Programming & Development", desc: "Practical guides, language updates, and software engineering best practices." },
-  { icon: Rocket, title: "Emerging Tech & Startups", desc: "Cutting-edge innovations from Web3, biotech, robotics, and startup ecosystems." },
-];
+{ icon: Brain, title: "Artificial Intelligence", desc: "Deep dives into machine learning, LLMs, and AI-powered tools transforming industries." },
+{ icon: Atom, title: "Quantum Computing", desc: "Breaking down quantum advancements and their real-world applications." },
+{ icon: Code2, title: "Programming & Development", desc: "Practical guides, language updates, and software engineering best practices." },
+{ icon: Rocket, title: "Emerging Tech & Startups", desc: "Cutting-edge innovations from Web3, biotech, robotics, and startup ecosystems." }];
+
 
 const trustPoints = [
-  "Research-backed articles",
-  "Clear and practical explanations",
-  "No clickbait, only valuable insights",
-  "Regular tech updates",
-];
+"Research-backed articles",
+"Clear and practical explanations",
+"No clickbait, only valuable insights",
+"Regular tech updates"];
+
 
 const About = () => {
   useEffect(() => {
@@ -73,15 +73,15 @@ const About = () => {
             </h2>
           </AnimatedSection>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
-            {coverItems.map((item, i) => (
-              <AnimatedSection key={item.title} delay={i * 0.1}>
+            {coverItems.map((item, i) =>
+            <AnimatedSection key={item.title} delay={i * 0.1}>
                 <div className="bg-card rounded-xl border border-border p-6 text-center card-hover h-full">
                   <item.icon size={32} className="mx-auto text-primary mb-4" />
                   <h3 className="text-base font-semibold text-foreground mb-2">{item.title}</h3>
                   <p className="text-sm text-muted-foreground">{item.desc}</p>
                 </div>
               </AnimatedSection>
-            ))}
+            )}
           </div>
         </div>
       </section>
@@ -90,18 +90,18 @@ const About = () => {
       <section className="py-16">
         <div className="container mx-auto px-4">
           <AnimatedSection className="max-w-2xl mx-auto">
-            <h2 className="text-2xl font-bold text-foreground text-center mb-8">
-              Why Trust FutureByte?
+            <h2 className="text-2xl font-bold text-foreground text-center mb-8">Why Trust TechByte?
+
             </h2>
             <div className="space-y-4">
-              {trustPoints.map((point, i) => (
-                <AnimatedSection key={point} delay={i * 0.1}>
+              {trustPoints.map((point, i) =>
+              <AnimatedSection key={point} delay={i * 0.1}>
                   <div className="flex items-center gap-3 bg-card rounded-xl border border-border p-4">
                     <CheckCircle2 size={20} className="text-primary flex-shrink-0" />
                     <span className="text-sm text-foreground">{point}</span>
                   </div>
                 </AnimatedSection>
-              ))}
+              )}
             </div>
           </AnimatedSection>
         </div>
@@ -111,7 +111,7 @@ const About = () => {
       <section className="py-16 bg-muted/30">
         <div className="container mx-auto px-4">
           <AnimatedSection className="max-w-2xl mx-auto text-center">
-            <h2 className="text-2xl font-bold text-foreground mb-4">Behind FutureByte</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-4">Behind TechByte</h2>
             <p className="text-muted-foreground leading-relaxed">
               FutureByte was created by passionate tech enthusiasts dedicated to
               exploring innovation and simplifying complex technology for a global
@@ -134,8 +134,8 @@ const About = () => {
             </p>
             <Link
               to="/"
-              className="inline-block mt-6 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium text-sm hover:opacity-90 transition-opacity"
-            >
+              className="inline-block mt-6 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium text-sm hover:opacity-90 transition-opacity">
+              
               Explore Latest Articles
             </Link>
           </AnimatedSection>
@@ -143,8 +143,8 @@ const About = () => {
       </section>
 
       <Footer />
-    </div>
-  );
+    </div>);
+
 };
 
 export default About;
