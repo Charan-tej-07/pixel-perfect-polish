@@ -1,6 +1,10 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
+import NewsletterModal from "./NewsletterModal";
 
 const HeroSection = () => {
+  const [showNewsletter, setShowNewsletter] = useState(false);
+
   const scrollToPosts = () => {
     document.getElementById("posts")?.scrollIntoView({ behavior: "smooth" });
   };
@@ -38,13 +42,14 @@ const HeroSection = () => {
             </button>
             <button
               type="button"
-              onClick={scrollToPosts}
+              onClick={() => setShowNewsletter(true)}
               className="px-6 py-3 border border-border text-foreground rounded-lg font-medium text-sm hover:bg-secondary transition-colors"
             >
               Subscribe
             </button>
           </div>
         </motion.div>
+        <NewsletterModal isOpen={showNewsletter} onClose={() => setShowNewsletter(false)} />
       </div>
     </section>
   );
