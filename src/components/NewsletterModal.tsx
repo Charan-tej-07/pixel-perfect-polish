@@ -144,7 +144,7 @@ const NewsletterModal = ({ isOpen, onClose }: NewsletterModalProps) => {
             {status === "success" ? (
               <div className="text-center py-4">
                 <div className="text-3xl mb-3">🎉</div>
-                <p className="text-sm font-medium text-green-500">{message}</p>
+                <p className="text-sm font-medium text-primary">{message}</p>
                 <button
                   onClick={handleClose}
                   className="mt-4 px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
